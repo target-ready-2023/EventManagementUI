@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import AddIcon from '@mui/icons-material/Add';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import EditIcon from '@mui/icons-material/Edit';
+
 import {
   Table,
   TableContainer,
@@ -20,14 +21,10 @@ import {
   IconButton,
   Alert,
   Snackbar,
-  makeStyles
+  useTheme
 } from "@mui/material";
 
-const useStyles = makeStyles(theme =>({
-  root:{
-      top: theme.spacing(9)
-  }
-}))
+
 
 
 export const Admin_Event = () => {
@@ -38,15 +35,48 @@ export const Admin_Event = () => {
     End_Date: "",
     Last_Date_to_Register: "",
   });
-
+  
   const [tableData, setTableData] = useState([
-    // Your existing events data
+    // Existing events data
   ]);
 
   const [open, setOpen] = useState(false);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [showEditSuccessAlert, setEditSuccessAlert] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
+  const [editingRecord, setEditingRecord] = useState(null);
+  const [startDate,setStartDate] = useState("");
+  const [endDate,setEndDate] = useState("");
+  const [lastDateRegister,setLastDateRegister] = useState("");
+  
+
+
+  const theme = useTheme();
+
+  const handleStartDateChange = (e) => {
+    setStartDate(e.target.value);
+    setFormData((prevState) => ({
+      ...prevState,
+      Start_Date: e.target.value,
+    }));
+
+  };
+  const handleEndDateChange = (e) => {
+    setEndDate(e.target.value);
+    setFormData((prevState) => ({     
+      ...prevState,
+      End_Date: e.target.value,
+    }));
+  };
+
+  const handleLastRegisterDateChange = (e) => {
+    setLastDateRegister(e.target.value);
+    setFormData((prevState) => ({      
+      ...prevState,
+      Last_Date_to_Register: e.target.value,
+    }));
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -55,11 +85,77 @@ export const Admin_Event = () => {
       [name]: value,
     }));
   };
+  useEffect(() => {
+  
+      setFormData({
+        Event_Name: "",
+        Event_Type: "",
+        Start_Date: "",
+        End_Date: "",
+        Last_Date_to_Register: "",
+      });
+      setStartDate("");
+      setEndDate("");
+      setLastDateRegister("");
+    
+  }, []);
+
+  const handleCancel=()=>{
+    setFormData({
+      Event_Name: "",
+      Event_Type: "",
+      Start_Date: "",
+      End_Date: "",
+      Last_Date_to_Register: "",
+    });
+    setStartDate("");
+    setEndDate("");
+    setLastDateRegister("");
+    setEditingRecord(null);
+    setOpen(false);
+
+  }
+  const handleUpdate = () => {
+    const index = tableData.findIndex((record) => record.id === editingRecord.id);
+    const updatedTableData = [...tableData];
+    updatedTableData[index] = formData;
+    updatedTableData[index].id = index + 1;
+    setTableData(updatedTableData);
+    setFormData({
+      Event_Name: "",
+      Event_Type: "",
+      Start_Date: "",
+      End_Date: "",
+      Last_Date_to_Register: "",
+    });
+    setStartDate("");
+    setEndDate("");
+    setLastDateRegister("");
+    setEditingRecord("");
+    setOpen(false); // Close the edit modal
+    setEditSuccessAlert(true);
+
+  }
+  useEffect(() => {
+    if (editingRecord) {
+      setFormData({
+        Event_Name: editingRecord.Event_Name,
+        Event_Type: editingRecord.Event_Type,
+        Start_Date: editingRecord.Start_Date,
+        End_Date: editingRecord.End_Date,
+        Last_Date_to_Register: editingRecord.Last_Date_to_Register,
+      });
+      setStartDate(editingRecord.Start_Date);
+      setEndDate(editingRecord.End_Date);
+      setLastDateRegister(editingRecord.Last_Date_to_Register);
+    }
+  }, [editingRecord]);
 
   const handleSubmit = () => {
     //  validation to ensure all fields are filled properly.
-    if(formData.Event_Name && formData.Event_Type && formData.Start_Date && formData.End_Date && formData.Last_Date_to_Register){
-    setTableData((prevState) => [...prevState, { ...formData, id: tableData.length + 1 }]);
+    if(formData.Event_Name && formData.Event_Type && formData.Start_Date && formData.End_Date && formData.Last_Date_to_Register)
+    {
+    setTableData((prevState) => [...prevState, { ...formData, id: tableData.length + 1, Start_Date:startDate, End_Date:endDate,Last_Date_to_Register:lastDateRegister }]);
     // Reset the form data
     setFormData({
       Event_Name: "",
@@ -68,7 +164,9 @@ export const Admin_Event = () => {
       End_Date: "",
       Last_Date_to_Register: "",
     });
-    
+    setStartDate("");
+    setEndDate("");
+    setLastDateRegister("");
     setOpen(false);
     setShowSuccessAlert(true); // Close the modal after submitting the form
     
@@ -80,6 +178,10 @@ export const Admin_Event = () => {
 
   };
 
+  const editHandler = (record)=>{
+    setEditingRecord(record);
+    setOpen(true);
+  }
   const deleteHandler= (id)=>{
 
     const updatedTable = tableData.filter((curElement)=>{
@@ -89,7 +191,9 @@ export const Admin_Event = () => {
     setTableData(updatedTable);
    
   }
-  const classes = useStyles()
+
+
+  
   return (
     <Box>
     <div style={{ display: 'flex', justifyContent: 'center', marginBottom:"20px" }}>
@@ -99,14 +203,16 @@ export const Admin_Event = () => {
     </div>
 
       <Dialog open={open} onClose={() => setOpen(false)}>
-        <DialogTitle>Add Event</DialogTitle>
+        <DialogTitle>{editingRecord ? "Edit Event" : "Add Event"}</DialogTitle>
         <DialogContent>
           {/* Create Event Form */}
+          
           <TextField
             name="Event_Name"
             value={formData.Event_Name}
             onChange={handleChange}
             label="Event Name"
+            required
             fullWidth
             margin="normal"
 
@@ -116,49 +222,84 @@ export const Admin_Event = () => {
             value={formData.Event_Type}
             onChange={handleChange}
             label="Event Type"
+            required
             fullWidth
             margin="normal"
 
           />
-          <TextField
-            name="Start_Date"
-            value={formData.Start_Date}
-            onChange={handleChange}
+             <TextField
+            type="date"
             label="Start Date"
-            fullWidth
-            margin="normal"
-
+            value={startDate}
+            onChange={handleStartDateChange}
+            className="inputField"
+            required
+            InputLabelProps={{
+              shrink: true,
+              sx: { fontSize: { xs: "12px", sm: "15px" } },
+            }}
+            InputProps={{
+              sx: {
+                fontSize: theme.breakpoints.down("sm") ? "12px" : "8px",
+              },
+            }}
           />
+
           <TextField
-            name="End_Date"
-            value={formData.End_Date}
-            onChange={handleChange}
+            type="date"
             label="End Date"
-            fullWidth
-            margin="normal"
-
+            value={endDate}
+            onChange={handleEndDateChange}
+            className="inputField"
+            required
+            InputLabelProps={{
+              shrink: true,
+              sx: { fontSize: { xs: "12px", sm: "15px" } },
+            }}
+            InputProps={{
+              sx: {
+                fontSize: theme.breakpoints.down("sm") ? "12px" : "8px",
+              },
+            }}           
           />
+
           <TextField
-            name="Last_Date_to_Register"
-            value={formData.Last_Date_to_Register}
-            onChange={handleChange}
+            type="date"
             label="Last Date to Register"
-            fullWidth
-            margin="normal"
-
+            value={lastDateRegister}
+            onChange={handleLastRegisterDateChange}
+            className="inputField"
+            required
+            InputLabelProps={{
+              shrink: true,
+              sx: { fontSize: { xs: "12px", sm: "15px" } },
+            }}
+            InputProps={{
+              sx: {
+                fontSize: theme.breakpoints.down("sm") ? "12px" : "8px",
+              },
+              
+            }}
+            
           />
+        
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpen(false)}>Cancel</Button>
+        <Button onClick={handleCancel}>Cancel</Button>
+        {editingRecord ? (
+          <Button onClick={handleUpdate} variant="contained" color="primary">
+            Update
+          </Button>
+        ) : (
           <Button onClick={handleSubmit} variant="contained" color="primary">
             Create
           </Button>
-        </DialogActions>
+        )}
+      </DialogActions>
       </Dialog>
 
 
       <Snackbar
-        className={classes.root}
         open={showSuccessAlert}
         autoHideDuration={3000}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
@@ -168,9 +309,19 @@ export const Admin_Event = () => {
         Created Successfully
       </Alert>
       </Snackbar>
-
+      
       <Snackbar
-        className={classes.root}
+        open={showEditSuccessAlert}
+        autoHideDuration={3000}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        onClose={() => setEditSuccessAlert(false)}
+      >
+      <Alert onClose={() => setEditSuccessAlert(false)} severity="success">
+        Event Edited Successfully
+      </Alert>
+      </Snackbar>
+
+      <Snackbar     
         open={showDeleteAlert}
         autoHideDuration={3000}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
@@ -181,8 +332,7 @@ export const Admin_Event = () => {
       </Alert>
       </Snackbar>
 
-      <Snackbar
-        className={classes.root}
+      <Snackbar      
         open={showErrorAlert}
         autoHideDuration={3000}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
@@ -219,7 +369,7 @@ export const Admin_Event = () => {
                 <TableCell>{row.End_Date}</TableCell>
                 <TableCell>{row.Last_Date_to_Register}</TableCell>
                 <TableCell> <IconButton onClick={()=>deleteHandler(row.id)}><DeleteForeverIcon  sx={{ color: 'red'}}/></IconButton></TableCell>
-                <TableCell><IconButton><EditIcon  /></IconButton></TableCell>
+                <TableCell><IconButton onClick={()=>editHandler(row)}><EditIcon  /></IconButton></TableCell>
               </TableRow>
             ))}
           </TableBody>

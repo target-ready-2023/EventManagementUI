@@ -115,6 +115,7 @@ export const Admin_Event = () => {
     setOpen(false);
 
   }
+
   const handleUpdate = () => {
     const index = tableData.findIndex((record) => record.id === editingRecord.id);
     const updatedTableData = [...tableData];
@@ -136,6 +137,8 @@ export const Admin_Event = () => {
     setEditSuccessAlert(true);
 
   }
+
+
   useEffect(() => {
     if (editingRecord) {
       setFormData({
@@ -153,27 +156,26 @@ export const Admin_Event = () => {
 
   const handleSubmit = () => {
     //  validation to ensure all fields are filled properly.
-    if(formData.Event_Name && formData.Event_Type && formData.Start_Date && formData.End_Date && formData.Last_Date_to_Register)
-    {
-    setTableData((prevState) => [...prevState, { ...formData, id: tableData.length + 1, Start_Date:startDate, End_Date:endDate,Last_Date_to_Register:lastDateRegister }]);
+    if(formData.Event_Name && formData.Event_Type && formData.Start_Date && formData.End_Date && formData.Last_Date_to_Register){
+      setTableData((prevState) => [...prevState, { ...formData, id: tableData.length + 1, Start_Date:startDate, End_Date:endDate,Last_Date_to_Register:lastDateRegister }]);
     // Reset the form data
-    setFormData({
-      Event_Name: "",
-      Event_Type: "",
-      Start_Date: "",
-      End_Date: "",
-      Last_Date_to_Register: "",
-    });
-    setStartDate("");
-    setEndDate("");
-    setLastDateRegister("");
-    setOpen(false);
-    setShowSuccessAlert(true); // Close the modal after submitting the form
+      setFormData({
+        Event_Name: "",
+        Event_Type: "",
+        Start_Date: "",
+        End_Date: "",
+        Last_Date_to_Register: "",
+      });
+      setStartDate("");
+      setEndDate("");
+      setLastDateRegister("");
+      setOpen(false);
+      setShowSuccessAlert(true); // Close the modal after submitting the form
     
-  }
-  else{
-    setShowErrorAlert(true);
-  }
+    }
+    else{
+      setShowErrorAlert(true);
+    }
     
 
   };
@@ -182,14 +184,13 @@ export const Admin_Event = () => {
     setEditingRecord(record);
     setOpen(true);
   }
-  const deleteHandler= (id)=>{
 
+  const deleteHandler= (id)=>{
     const updatedTable = tableData.filter((curElement)=>{
       return curElement.id !== id;
     })
     setShowDeleteAlert(true);
-    setTableData(updatedTable);
-   
+    setTableData(updatedTable);   
   }
 
 
@@ -233,7 +234,9 @@ export const Admin_Event = () => {
             value={startDate}
             onChange={handleStartDateChange}
             className="inputField"
+            fullWidth
             required
+            margin="normal"
             InputLabelProps={{
               shrink: true,
               sx: { fontSize: { xs: "12px", sm: "15px" } },
@@ -251,7 +254,9 @@ export const Admin_Event = () => {
             value={endDate}
             onChange={handleEndDateChange}
             className="inputField"
+            fullWidth
             required
+            margin="normal"
             InputLabelProps={{
               shrink: true,
               sx: { fontSize: { xs: "12px", sm: "15px" } },
@@ -270,6 +275,8 @@ export const Admin_Event = () => {
             onChange={handleLastRegisterDateChange}
             className="inputField"
             required
+            fullWidth
+            margin="normal"
             InputLabelProps={{
               shrink: true,
               sx: { fontSize: { xs: "12px", sm: "15px" } },

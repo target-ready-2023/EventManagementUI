@@ -2,7 +2,7 @@ import React, { useState,useEffect } from "react";
 import AddIcon from '@mui/icons-material/Add';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import EditIcon from '@mui/icons-material/Edit';
-
+import axios from "axios";
 import {
   Table,
   TableContainer,
@@ -23,17 +23,18 @@ import {
   Snackbar,
   useTheme
 } from "@mui/material";
+import { useParams } from "react-router-dom";
 
 
 
 
 export const Admin_Event = () => {
   const [formData, setFormData] = useState({
-    Event_Name: "",
-    Event_Type: "",
-    Start_Date: "",
-    End_Date: "",
-    Last_Date_to_Register: "",
+    title: "",
+    eventType: "",
+    startDate: "",
+    endDate: "",
+    lastDateForRegistration: "",
   });
   
   const [tableData, setTableData] = useState([
@@ -49,8 +50,17 @@ export const Admin_Event = () => {
   const [startDate,setStartDate] = useState("");
   const [endDate,setEndDate] = useState("");
   const [lastDateRegister,setLastDateRegister] = useState("");
+  const {id}= useParams();
   
-
+  useEffect(()=>{
+    loadEvents();
+  },[]);
+  const loadEvents = async()=>{
+    const results = await axios.get("http://localhost:8080/api/events");
+    console.log(results);
+    results.data.data.sort((a, b) => a.id - b.id);
+    setTableData(results.data.data);
+  }
 
   const theme = useTheme();
 
@@ -58,7 +68,7 @@ export const Admin_Event = () => {
     setStartDate(e.target.value);
     setFormData((prevState) => ({
       ...prevState,
-      Start_Date: e.target.value,
+      startDate: e.target.value,
     }));
 
   };
@@ -66,7 +76,7 @@ export const Admin_Event = () => {
     setEndDate(e.target.value);
     setFormData((prevState) => ({     
       ...prevState,
-      End_Date: e.target.value,
+      endDate: e.target.value,
     }));
   };
 
@@ -74,7 +84,7 @@ export const Admin_Event = () => {
     setLastDateRegister(e.target.value);
     setFormData((prevState) => ({      
       ...prevState,
-      Last_Date_to_Register: e.target.value,
+      lastDateForRegistration: e.target.value,
     }));
   };
 
@@ -85,28 +95,28 @@ export const Admin_Event = () => {
       [name]: value,
     }));
   };
-  useEffect(() => {
+  // useEffect(() => {
   
-      setFormData({
-        Event_Name: "",
-        Event_Type: "",
-        Start_Date: "",
-        End_Date: "",
-        Last_Date_to_Register: "",
-      });
-      setStartDate("");
-      setEndDate("");
-      setLastDateRegister("");
+  //     setFormData({
+  //       title: "",
+  //       eventType: "",
+  //       startDate: "",
+  //       endDate: "",
+  //       lastDateForRegistration: ""
+  //     });
+  //     setStartDate("");
+  //     setEndDate("");
+  //     setLastDateRegister("");
     
-  }, []);
+  // }, []);
 
   const handleCancel=()=>{
     setFormData({
-      Event_Name: "",
-      Event_Type: "",
-      Start_Date: "",
-      End_Date: "",
-      Last_Date_to_Register: "",
+      title: "",
+      eventType: "",
+      startDate: "",
+      endDate: "",
+      lastDateForRegistration: ""
     });
     setStartDate("");
     setEndDate("");
@@ -116,18 +126,29 @@ export const Admin_Event = () => {
 
   }
 
-  const handleUpdate = () => {
+  const handleUpdate = async() => {
     const index = tableData.findIndex((record) => record.id === editingRecord.id);
     const updatedTableData = [...tableData];
     updatedTableData[index] = formData;
     updatedTableData[index].id = index + 1;
-    setTableData(updatedTableData);
+    const id = editingRecord.id;
+    try {
+    await axios.put(`http://localhost:8080/api/events/${id}`, updatedTableData[index]);
+    const response = await axios.get("http://localhost:8080/api/events");
+    response.data.data.sort((a, b) => a.id - b.id);
+    setTableData(response.data.data); // Assuming your API returns an array of data
+
+    // ...rest of your code
+  } catch (error) {
+    console.error("Error updating data:", error);
+    // Handle error here
+  }
     setFormData({
-      Event_Name: "",
-      Event_Type: "",
-      Start_Date: "",
-      End_Date: "",
-      Last_Date_to_Register: "",
+      title: "",
+      eventType: "",
+      startDate: "",
+      endDate: "",
+      lastDateForRegistration: ""
     });
     setStartDate("");
     setEndDate("");
@@ -142,29 +163,41 @@ export const Admin_Event = () => {
   useEffect(() => {
     if (editingRecord) {
       setFormData({
-        Event_Name: editingRecord.Event_Name,
-        Event_Type: editingRecord.Event_Type,
-        Start_Date: editingRecord.Start_Date,
-        End_Date: editingRecord.End_Date,
-        Last_Date_to_Register: editingRecord.Last_Date_to_Register,
+        title: editingRecord.title,
+        eventType: editingRecord.eventType,
+        startDate: editingRecord.startDate,
+        endDate: editingRecord.endDate,
+        lastDateForRegistration: editingRecord.lastDateForRegistration,
       });
-      setStartDate(editingRecord.Start_Date);
-      setEndDate(editingRecord.End_Date);
-      setLastDateRegister(editingRecord.Last_Date_to_Register);
+      setStartDate(editingRecord.startDate);
+      setEndDate(editingRecord.endDate);
+      setLastDateRegister(editingRecord.lastDateForRegistration);
     }
   }, [editingRecord]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async() => {
     //  validation to ensure all fields are filled properly.
-    if(formData.Event_Name && formData.Event_Type && formData.Start_Date && formData.End_Date && formData.Last_Date_to_Register){
-      setTableData((prevState) => [...prevState, { ...formData, id: tableData.length + 1, Start_Date:startDate, End_Date:endDate,Last_Date_to_Register:lastDateRegister }]);
+    if(formData.title && formData.eventType && formData.startDate && formData.endDate && formData.lastDateForRegistration){
+      console.log(formData)
+     
+      try {
+        await axios.post("http://localhost:8080/api/events",formData)
+        const response = await axios.get("http://localhost:8080/api/events");
+        setTableData(response.data.data); 
+    
+       
+      } catch (error) {
+        console.error("Error Creating Event:", error);
+        // Handle error here
+      }
+      
     // Reset the form data
       setFormData({
-        Event_Name: "",
-        Event_Type: "",
-        Start_Date: "",
-        End_Date: "",
-        Last_Date_to_Register: "",
+        title: "",
+        eventType: "",
+        startDate: "",
+        endDate: "",
+        lastDateForRegistration: ""
       });
       setStartDate("");
       setEndDate("");
@@ -185,12 +218,24 @@ export const Admin_Event = () => {
     setOpen(true);
   }
 
-  const deleteHandler= (id)=>{
-    const updatedTable = tableData.filter((curElement)=>{
-      return curElement.id !== id;
-    })
+  const deleteHandler= async(id)=>{
+    try {
+      await axios.delete(`http://localhost:8080/api/events/${id}`)
+      const response = await axios.get("http://localhost:8080/api/events");
+      response.data.data.sort((a, b) => a.id - b.id);
+      setTableData(response.data.data); 
+  
+      
+    } catch (error) {
+      console.error("Error Deleting Event:", error);
+      // Handle error here
+    }
+   
+    // const updatedTable = tableData.filter((curElement)=>{
+    //   return curElement.id !== id;
+    // })
     setShowDeleteAlert(true);
-    setTableData(updatedTable);   
+    // setTableData(updatedTable);   
   }
 
 
@@ -209,8 +254,8 @@ export const Admin_Event = () => {
           {/* Create Event Form */}
           
           <TextField
-            name="Event_Name"
-            value={formData.Event_Name}
+            name="title"
+            value={formData.title}
             onChange={handleChange}
             label="Event Name"
             required
@@ -219,8 +264,8 @@ export const Admin_Event = () => {
 
           />
           <TextField
-            name="Event_Type"
-            value={formData.Event_Type}
+            name="eventType"
+            value={formData.eventType}
             onChange={handleChange}
             label="Event Type"
             required
@@ -370,11 +415,11 @@ export const Admin_Event = () => {
             {tableData.map((row) => (
               <TableRow key={row.id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
                 <TableCell>{row.id}</TableCell>
-                <TableCell sx={{ maxWidth: "300px" }}>{row.Event_Name}</TableCell>
-                <TableCell>{row.Event_Type}</TableCell>
-                <TableCell>{row.Start_Date}</TableCell>
-                <TableCell>{row.End_Date}</TableCell>
-                <TableCell>{row.Last_Date_to_Register}</TableCell>
+                <TableCell sx={{ maxWidth: "300px" }}>{row.title}</TableCell>
+                <TableCell>{row.eventType}</TableCell>
+                <TableCell>{row.startDate}</TableCell>
+                <TableCell>{row.endDate}</TableCell>
+                <TableCell>{row.lastDateForRegistration}</TableCell>
                 <TableCell> <IconButton onClick={()=>deleteHandler(row.id)}><DeleteForeverIcon  sx={{ color: 'red'}}/></IconButton></TableCell>
                 <TableCell><IconButton onClick={()=>editHandler(row)}><EditIcon  /></IconButton></TableCell>
               </TableRow>

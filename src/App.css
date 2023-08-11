@@ -8,6 +8,7 @@
   font-size: 16px;
   color: white;
   display: flex;
+  width: 100%;
 }
 .App-header img {
   max-height: 70px;
@@ -15,11 +16,12 @@
 .App-footer {
   background-color: #6c88c8;
   font-size: 16px;
-  bottom: 0;
-  position: absolute;
+  position: relative; /* Change to relative */
   width: 100%;
   text-align: center;
   padding: 25px;
+  box-sizing: border-box; 
+
 }
 .App-footer a {
   color: white !important;

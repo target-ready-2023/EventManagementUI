@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Table, TableHead, TableRow, TableCell, TableContainer, Box, TableBody, Paper,Button,Snackbar,Alert } from '@mui/material';
+import {  Pagination,Table, TableHead, TableRow, TableCell, TableContainer, Box, TableBody, Paper,Button,Snackbar,Alert } from '@mui/material';
 import axios from "axios";
 import { useParams } from "react-router-dom";
 
@@ -9,6 +9,11 @@ const RegisterPage = (props) => {
   const [tableData, setTableData] = useState([]);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 4; 
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const displayedData = tableData.slice(startIndex, endIndex);
   // const {eventId,userId}= useParams();
 
   useEffect(() => {
@@ -47,6 +52,10 @@ const RegisterPage = (props) => {
       console.error("Error loading events:", error);
     }
   };
+
+      const handlePageChange = (event, newPage) => {
+        setCurrentPage(newPage);
+      };
 
 
       const handleRegister= async(eventId)=>{
@@ -89,7 +98,7 @@ const RegisterPage = (props) => {
 
 
 
-      <TableContainer component={Paper} sx={{ maxHeight: "400px", maxWidth: "99%", marginLeft:"20px",marginBottom:"20px" }}>
+      <TableContainer component={Paper} sx={{ maxHeight: "360px", maxWidth: "98%", marginLeft:"20px",marginBottom:"20px" }}>
         <Table aria-label="simple table" stickyHeader>
         <TableHead>
             <TableRow>
@@ -103,7 +112,7 @@ const RegisterPage = (props) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {tableData.map((row) => (
+            {displayedData.map((row) => (
               <TableRow key={row.id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
                 <TableCell>{row.id}</TableCell>
                 <TableCell sx={{ maxWidth: "300px" }}>{row.title}</TableCell>
@@ -121,6 +130,11 @@ const RegisterPage = (props) => {
         </Table>
       
       </TableContainer>
+      <Pagination
+        count={Math.ceil(tableData.length / itemsPerPage)}
+        page={currentPage}
+        onChange={handlePageChange}sx={{marginBottom:"40px"}}
+      />
     </Box>
   );
 };

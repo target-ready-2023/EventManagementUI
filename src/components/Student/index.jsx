@@ -4,7 +4,7 @@ import RegisterPage from './registerPage'; // Import using PascalCase naming con
 
 const Student = () => {
     return (
-        <Card className="App-Card">
+        <Card className="App-Card"  style={{ marginBottom: "40px" }}>
             <h3>Upcoming Events</h3>
             <RegisterPage state ={"upcoming"} /> {/* Use the component here */}
             <h3>Closed Events</h3>

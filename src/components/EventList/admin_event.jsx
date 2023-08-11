@@ -4,6 +4,7 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import EditIcon from '@mui/icons-material/Edit';
 import axios from "axios";
 import {
+  Pagination,
   Table,
   TableContainer,
   TableHead,
@@ -50,7 +51,12 @@ export const Admin_Event = () => {
   const [startDate,setStartDate] = useState("");
   const [endDate,setEndDate] = useState("");
   const [lastDateRegister,setLastDateRegister] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const {id}= useParams();
+  const itemsPerPage = 4;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const displayedData = tableData.slice(startIndex, endIndex);
   
   useEffect(()=>{
     loadEvents();
@@ -61,6 +67,10 @@ export const Admin_Event = () => {
     results.data.data.sort((a, b) => a.id - b.id);
     setTableData(results.data.data);
   }
+  
+  const handlePageChange = (event, newPage) => {
+    setCurrentPage(newPage);
+  };
 
   const theme = useTheme();
 
@@ -207,8 +217,7 @@ export const Admin_Event = () => {
         // Handle error here
       }
       
-    // Reset the form data
-      // Close the modal after submitting the form
+   
     
     }
     else{
@@ -236,11 +245,9 @@ export const Admin_Event = () => {
       // Handle error here
     }
    
-    // const updatedTable = tableData.filter((curElement)=>{
-    //   return curElement.id !== id;
-    // })
+   
     setShowDeleteAlert(true);
-    // setTableData(updatedTable);   
+    
   }
 
 
@@ -414,7 +421,7 @@ export const Admin_Event = () => {
 
       {/* Event Table */}
       {/* <TableList/> */}
-      <TableContainer component={Paper} sx={{ maxHeight: "400px",maxWidth:"99%",marginBottom: "80px"}}>
+      <TableContainer component={Paper} sx={{ maxHeight: "360px",maxWidth:"99%",marginBottom: "30px"}}>
         <Table aria-label="simple table" stickyHeader>
           <TableHead>
             <TableRow>
@@ -429,7 +436,7 @@ export const Admin_Event = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {tableData.map((row) => (
+            {displayedData.map((row) => (
               <TableRow key={row.id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
                 <TableCell>{row.id}</TableCell>
                 <TableCell sx={{ maxWidth: "300px" }}>{row.title}</TableCell>
@@ -444,6 +451,11 @@ export const Admin_Event = () => {
           </TableBody>
         </Table>
       </TableContainer>
+      <Pagination
+        count={Math.ceil(tableData.length / itemsPerPage)}
+        page={currentPage}
+        onChange={handlePageChange}sx={{marginBottom:"10px"}}
+      />
     </Box>
   );
 };

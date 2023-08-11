@@ -9,6 +9,10 @@
   color: white;
   display: flex;
   width: 100%;
+  position: fixed;
+  top: 0;
+  z-index: 100;
+  
 }
 .App-header img {
   max-height: 70px;
@@ -16,11 +20,14 @@
 .App-footer {
   background-color: #6c88c8;
   font-size: 16px;
-  position: relative; /* Change to relative */
+  position: fixed;
   width: 100%;
   text-align: center;
   padding: 25px;
   box-sizing: border-box; 
+  bottom:0;
+  z-index: 100;
+  margin-top: 90px;
 
 }
 .App-footer a {
@@ -39,6 +46,7 @@
 .App-Card {
   box-shadow: none !important;
   text-align: center;
+  margin-top: 80px;
 }
 .App-Card a {
   margin-right: 20px;

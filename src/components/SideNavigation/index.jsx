@@ -23,6 +23,12 @@ const SideNavigation = () => {
     navigate('/student')
     handleClose()
   }
+  const handleEvent = () => {
+    navigate('/event')
+    handleClose()
+  }
+
+
   return (
     <>
       <Button
@@ -45,6 +51,7 @@ const SideNavigation = () => {
       >
         <MenuItem onClick={handleHome}>Home</MenuItem>
         <MenuItem onClick={handleStudent}>Student</MenuItem>
+        <MenuItem onClick={handleEvent}>Event</MenuItem>
       </Menu>
     </>
   );

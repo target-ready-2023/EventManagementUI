@@ -4,6 +4,10 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import EditIcon from '@mui/icons-material/Edit';
 import axios from "axios";
 import {
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
   Pagination,
   Table,
   TableContainer,
@@ -30,7 +34,7 @@ import { useParams } from "react-router-dom";
 
 
 
-export const Admin_Event = () => {
+export const AdminEvent = () => {
   const [formData, setFormData] = useState({
     title: "",
     eventType: "",
@@ -275,16 +279,20 @@ export const Admin_Event = () => {
             margin="normal"
 
           />
-          <TextField
-            name="eventType"
-            value={formData.eventType}
-            onChange={handleChange}
-            label="Event Type"
-            required
-            fullWidth
-            margin="normal"
-
-          />
+        
+  <FormControl fullWidth>
+  <InputLabel >Event Type</InputLabel>
+  <Select    
+    name="eventType"
+    value={formData.eventType}
+    label="eventType"
+    onChange={handleChange}
+  >
+    <MenuItem value="Sports day">Sports day</MenuItem>
+    <MenuItem value="School day">School day</MenuItem>
+    <MenuItem value="Talent day">Talent day</MenuItem>
+  </Select>
+</FormControl>
              <TextField
             type="date"
             label="Start Date"
@@ -459,3 +467,5 @@ export const Admin_Event = () => {
     </Box>
   );
 };
+
+export default AdminEvent

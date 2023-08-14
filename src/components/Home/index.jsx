@@ -1,5 +1,5 @@
 import { Card, Box } from "@mui/material";
-import { Admin_Event } from "../EventList/admin_event";
+import { AdminEvent } from "../EventList/AdminEvent";
 
 
 const Home = () => {
@@ -9,7 +9,7 @@ const Home = () => {
         <h3>List of Events</h3>
       </Card>
      
-     <Admin_Event/>
+     <AdminEvent/>
     </Box>
   );
 };

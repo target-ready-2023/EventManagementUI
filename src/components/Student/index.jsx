@@ -5,7 +5,7 @@ import StudentProfile from './studentProfile'
 const Student = () => {
     return (
         <Card className="App-Card"  style={{ marginBottom: "40px" }}>
-            <h3>List of Events that you have registered</h3>
+            <h3>Registered Events </h3>
             <StudentProfile/>
         </Card>
     );

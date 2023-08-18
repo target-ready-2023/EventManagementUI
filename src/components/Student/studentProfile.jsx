@@ -31,12 +31,12 @@ const StudentProfile = () => {
   }, []);
 
   const load_events = async () => {
-    const userId = 38;
+    const userId = 2;
     // try{
     await instance
       .get(`/api/registration/eventsForUser/${userId}`)
       .then((registered_events) => {
-        console.log(registered_events);
+        // console.log(registered_events);
         setTableData(registered_events.data.data);
       })
       .catch((error) => {
@@ -55,10 +55,12 @@ const StudentProfile = () => {
     // load_events()
   }, [tableData]);
   const handleDeregister = async (eventId) => {
+   
     try {
-      const userId = 38;
+      const userId = 2;
       // console.log(eventId.data.data[0].id);
-      await instance.post(`/api/registration/deregister`,{userId:userId,eventId:eventId});
+      console.log("hi",eventId.id)
+      await instance.delete(`/api/registration/deregister`,{userId:userId,eventId:eventId.id});
     
       await load_events();
       setShowSuccessAlert(true);

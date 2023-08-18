@@ -57,7 +57,7 @@ export const AdminEvent = () => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const displayedData = tableData.slice(startIndex, endIndex);
-  let msg;
+  const [msg, setMsg] = useState('Please fill all fields');
 
   useEffect(() => {
     load();
@@ -131,6 +131,9 @@ export const AdminEvent = () => {
       loadEvents();
     } catch (error) {
       console.error("Error updating data:", error);
+      setMsg(error.response.data.message)
+      setShowErrorAlert(true);
+
     }
 
     setFormData({
@@ -196,27 +199,38 @@ export const AdminEvent = () => {
         } else {
           setTableData(response.data.data);
           try {
-            await instance.post(`/api/events`, formData);
+            await instance.post(`/api/events`, formData).then(response=>{
+              console.log(response)
+              load();
+              setFormData({
+                title: "",
+                eventType: "",
+                startDate: "",
+                endDate: "",
+                lastRegistrationDate: "",
+              });
+              setStartDate("");
+              setEndDate("");
+              setLastDateRegister("");
+              setOpen(false);
+              setShowSuccessAlert(true);
+            }).catch(err=>{
+              if(err.response){
+                const errorMessage = err.response.data.message;
+                setMsg(errorMessage)
+                setShowErrorAlert(true);
+                
+              }
+              
+              
+            })
             console.log(formData)
-            load();
+            // load();
           } catch (error) {
-            msg = error;
-            setShowErrorAlert(true);
             console.log(error);
           }
 
-          setFormData({
-            title: "",
-            eventType: "",
-            startDate: "",
-            endDate: "",
-            lastRegistrationDate: "",
-          });
-          setStartDate("");
-          setEndDate("");
-          setLastDateRegister("");
-          setOpen(false);
-          setShowSuccessAlert(true);
+          
         }
       } catch (error) {
         console.error("Error Creating Event:", error);
@@ -389,7 +403,8 @@ export const AdminEvent = () => {
 
       <AlertSnackbar
         open={showErrorAlert}
-        onClose={() => setShowErrorAlert(false)}
+        onClose={() => {setShowErrorAlert(false)
+          setMsg("Please fill all the fields")}}
         severity="error"
         message={msg}
       />

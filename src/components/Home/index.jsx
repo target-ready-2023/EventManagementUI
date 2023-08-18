@@ -1,6 +1,6 @@
 import { Card, Box } from "@mui/material";
 import { AdminEvent } from "../EventList/AdminEvent";
-
+import RoleSelection from "./RoleSelection";
 
 const Home = () => {
   return (
@@ -8,8 +8,8 @@ const Home = () => {
       <Card className="App-Card">
         <h3>List of Events</h3>
       </Card>
-     
-     <AdminEvent/>
+     <RoleSelection/>
+     {/* <AdminEvent/> */}
     </Box>
   );
 };

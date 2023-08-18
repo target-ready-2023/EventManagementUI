@@ -45,11 +45,11 @@ const RegisterPage = (props) => {
       results.data.data.sort((a, b) => a.id - b.id);
 
       const events = results.data.data;
-      console.log(events);
+      // console.log(events);
       const currentDate = new Date();
 
       try {
-        const userId = 38;
+        const userId = 2;
         const registered_events = await instance.get(
           `/api/registration/eventsForUser/${userId}`
         );
@@ -88,7 +88,7 @@ const RegisterPage = (props) => {
         await instance.get("/api/events/pastEvents")
         .then(response => {
           setTableData(response.data.data);
-          console.log(response.data.data);
+          // console.log(response.data.data);
         })
         .catch(error => {
           console.log("Error", error);
@@ -105,8 +105,9 @@ const RegisterPage = (props) => {
 
   const handleDeregister = async (event) => {
     try {
-      const userId = 38;
-      await instance.post(`/api/registration/deregister`,{userId:userId,eventId:event.id});
+      const userId = 2;
+      console.log("de",event.id)
+      await instance.delete(`/api/registration/deregister`,{userId:userId,eventId:event.id});
      
       const updatedRegisteredData = registeredData.filter(
         (item) => item.id !== event.id
@@ -120,7 +121,8 @@ const RegisterPage = (props) => {
   };
   const handleRegister = async (event) => {
     try {
-      const userId = 38;
+      const userId = 2;
+      console.log("RE",event)
       await instance.post(`/api/registration/register`,{userId:userId,eventId:event.id});
       setRegisteredData([...registeredData, event]);
       setShowSuccessAlert(true);
@@ -254,7 +256,7 @@ const RegisterPage = (props) => {
                 <TableCell>{row.lastRegistrationDate}</TableCell>
                 {value.state === "upcoming" && (
                   <TableCell>
-                    {console.log(row in registeredData, row, registeredData)}
+                    {console.log(row in registeredData, row,)}
                     {registeredData.some((item) => item.id === row.id) ? (
                       <Button
                         variant="outlined"

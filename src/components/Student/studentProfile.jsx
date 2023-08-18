@@ -31,9 +31,10 @@ const StudentProfile = () => {
   }, []);
 
   const load_events = async () => {
+    const userId = 38;
     // try{
     await instance
-      .get(`/api/user/1/registered-events`)
+      .get(`/api/registration/eventsForUser/${userId}`)
       .then((registered_events) => {
         console.log(registered_events);
         setTableData(registered_events.data.data);
@@ -55,8 +56,10 @@ const StudentProfile = () => {
   }, [tableData]);
   const handleDeregister = async (eventId) => {
     try {
-      const userId = 1;
-      await instance.post(`/events/${eventId}/deregister/${userId}`);
+      const userId = 38;
+      // console.log(eventId.data.data[0].id);
+      await instance.post(`/api/registration/deregister`,{userId:userId,eventId:eventId});
+    
       await load_events();
       setShowSuccessAlert(true);
     } catch (error) {
@@ -170,14 +173,14 @@ const StudentProfile = () => {
                 <TableCell>{row.eventType}</TableCell>
                 <TableCell>{row.startDate}</TableCell>
                 <TableCell>{row.endDate}</TableCell>
-                <TableCell>{row.lastDateForRegistration}</TableCell>
+                <TableCell>{row.lastRegistrationDate}</TableCell>
                 <TableCell>
                   {" "}
                   <Button
                     variant="outlined"
                     style={{ color: "red", borderColor: "red" }}
                     onClick={() => {
-                      handleDeregister(row.id);
+                      handleDeregister(row);
                     }}
                   >
                     Deregister

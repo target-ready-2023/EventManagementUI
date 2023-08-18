@@ -45,11 +45,13 @@ const RegisterPage = (props) => {
       results.data.data.sort((a, b) => a.id - b.id);
 
       const events = results.data.data;
+      console.log(events);
       const currentDate = new Date();
+
       try {
-        const userId = 1;
+        const userId = 38;
         const registered_events = await instance.get(
-          `/api/user/${userId}/registered-events`
+          `/api/registration/eventsForUser/${userId}`
         );
         setRegisteredData(registered_events.data.data);
       } catch (error) {
@@ -57,21 +59,40 @@ const RegisterPage = (props) => {
       }
 
       if (props.state === "upcoming") {
-        const filteredData = events.filter((event) => {
-          const lastDateForRegistration = new Date(
-            event.lastDateForRegistration
+        // const filteredData = await instance.get(
+        //   `/api/events/upcomingEvents`
+        // );
+        /*events.filter((event) => {
+          const lastRegistrationDate = new Date(
+            event.lastRegistrationDate
           );
-          return lastDateForRegistration >= currentDate;
+          return lastRegistrationDate >= currentDate;
+        }); */
+        // setTableData(filteredData); 
+        await instance.get("/api/events/upcomingEvents")
+        .then(response => {
+          setTableData(response.data.data);
+        })
+        .catch(error => {
+          console.log("Error", error);
         });
-        setTableData(filteredData);
       } else {
-        const filteredData = events.filter((event) => {
-          const lastDateForRegistration = new Date(
-            event.lastDateForRegistration
-          );
-          return lastDateForRegistration < currentDate;
-        });
-        setTableData(filteredData);
+        // const filteredData = events.filter((event) => {
+        //   const lastRegistrationDate = new Date(
+        //     event.lastRegistrationDate
+        //   );
+        //   return lastRegistrationDate < currentDate;
+        // });
+        // setTableData(filteredData);
+        // console.log(filteredData);
+        await instance.get("/api/events/pastEvents")
+        .then(response => {
+          setTableData(response.data.data);
+          console.log(response.data.data);
+        })
+        .catch(error => {
+          console.log("Error", error);
+        }); 
       }
     } catch (error) {
       console.error("Error loading events:", error);
@@ -84,8 +105,8 @@ const RegisterPage = (props) => {
 
   const handleDeregister = async (event) => {
     try {
-      const userId = 1;
-      await instance.post(`/events/${event.id}/deregister/${userId}`);
+      const userId = 38;
+      await instance.post(`/api/registration/deregister`,{userId:userId,eventId:event.id});
      
       const updatedRegisteredData = registeredData.filter(
         (item) => item.id !== event.id
@@ -99,8 +120,8 @@ const RegisterPage = (props) => {
   };
   const handleRegister = async (event) => {
     try {
-      const userId = 1;
-      await instance.post(`/events/${event.id}/register/${userId}`);
+      const userId = 38;
+      await instance.post(`/api/registration/register`,{userId:userId,eventId:event.id});
       setRegisteredData([...registeredData, event]);
       setShowSuccessAlert(true);
     } catch (error) {
@@ -230,7 +251,7 @@ const RegisterPage = (props) => {
                 <TableCell>{row.eventType}</TableCell>
                 <TableCell>{row.startDate}</TableCell>
                 <TableCell>{row.endDate}</TableCell>
-                <TableCell>{row.lastDateForRegistration}</TableCell>
+                <TableCell>{row.lastRegistrationDate}</TableCell>
                 {value.state === "upcoming" && (
                   <TableCell>
                     {console.log(row in registeredData, row, registeredData)}
@@ -257,7 +278,7 @@ const RegisterPage = (props) => {
                       </Button>
                     )}
                   </TableCell>
-                )}
+                 )} 
               </TableRow>
             ))}
           </TableBody>

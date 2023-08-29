@@ -54,13 +54,14 @@ const StudentProfile = () => {
   useEffect(() => {
     // load_events()
   }, [tableData]);
-  const handleDeregister = async (eventId) => {
+  const handleDeregister = async (event) => {
    
     try {
       const userId = 2;
       // console.log(eventId.data.data[0].id);
-      console.log("hi",eventId.id)
-      await instance.delete(`/api/registration/deregister`,{userId:userId,eventId:eventId.id});
+      console.log("hi",event.id)
+      const dataToDelete = {userId:userId,eventId:event.id};
+      await instance.delete(`/api/registration/deregister`,{ data: dataToDelete });
     
       await load_events();
       setShowSuccessAlert(true);

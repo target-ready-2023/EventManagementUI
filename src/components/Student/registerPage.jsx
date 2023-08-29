@@ -36,18 +36,9 @@ const RegisterPage = (props) => {
     loadEvents();
   }, []);
 
-  // useEffect(() => {
-  // }, [registeredData]);
-
+  
   const loadEvents = async () => {
-    try {
-      const results = await instance.get(`/api/events`);
-      results.data.data.sort((a, b) => a.id - b.id);
-
-      const events = results.data.data;
-      // console.log(events);
-      const currentDate = new Date();
-
+    
       try {
         const userId = 2;
         const registered_events = await instance.get(
@@ -59,16 +50,6 @@ const RegisterPage = (props) => {
       }
 
       if (props.state === "upcoming") {
-        // const filteredData = await instance.get(
-        //   `/api/events/upcomingEvents`
-        // );
-        /*events.filter((event) => {
-          const lastRegistrationDate = new Date(
-            event.lastRegistrationDate
-          );
-          return lastRegistrationDate >= currentDate;
-        }); */
-        // setTableData(filteredData); 
         await instance.get("/api/events/upcomingEvents")
         .then(response => {
           setTableData(response.data.data);
@@ -77,41 +58,29 @@ const RegisterPage = (props) => {
           console.log("Error", error);
         });
       } else {
-        // const filteredData = events.filter((event) => {
-        //   const lastRegistrationDate = new Date(
-        //     event.lastRegistrationDate
-        //   );
-        //   return lastRegistrationDate < currentDate;
-        // });
-        // setTableData(filteredData);
-        // console.log(filteredData);
         await instance.get("/api/events/pastEvents")
         .then(response => {
           setTableData(response.data.data);
-          // console.log(response.data.data);
+          
         })
         .catch(error => {
           console.log("Error", error);
         }); 
       }
-    } catch (error) {
-      console.error("Error loading events:", error);
-    }
-  };
-
-  const handlePageChange = (event, newPage) => {
-    setCurrentPage(newPage);
+     
   };
 
   const handleDeregister = async (event) => {
     try {
       const userId = 2;
       console.log("de",event.id)
-      await instance.delete(`/api/registration/deregister`,{userId:userId,eventId:event.id});
-     
+      const dataToDelete = {userId:userId,eventId:event.id};
+      await instance.delete(`/api/registration/deregister`,{ data: dataToDelete });
+      console.log("after api",)
       const updatedRegisteredData = registeredData.filter(
         (item) => item.id !== event.id
       );
+      console.log("after filter")
       setRegisteredData(updatedRegisteredData);
       setShowDeSuccessAlert(true);
     } catch (error) {
@@ -119,6 +88,8 @@ const RegisterPage = (props) => {
       setShowDeErrorAlert(true);
     }
   };
+
+
   const handleRegister = async (event) => {
     try {
       const userId = 2;
@@ -131,6 +102,12 @@ const RegisterPage = (props) => {
       setShowErrorAlert(true);
     }
   };
+
+  
+  const handlePageChange = (event, newPage) => {
+    setCurrentPage(newPage);
+  };
+
 
   return (
     <Box>
